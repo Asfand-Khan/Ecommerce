@@ -1,18 +1,22 @@
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const productModel = require("../models/productModel");
+const ApiFeatures = require("../utils/apiFeatures");
 const ErrorHandler = require("../utils/errorHandler");
 
 // Get all products
-exports.getAllProducts = async (req, res, next) => {
-  const products = await productModel.find();
+exports.getAllProducts = catchAsyncError(async (req, res, next) => {
+  const queryStr = Object.keys(req.query).length === 0 ? null : req.query;
+  const apiFeatures = new ApiFeatures(productModel.find(), queryStr).search();
+  const products = await apiFeatures.query;
+
   res.status(200).json({
     success: true,
     products,
   });
-};
+});
 
 // Create a product -- Admin
-exports.createProduct = async (req, res, next) => {
+exports.createProduct = catchAsyncError(async (req, res, next) => {
   const product = req.body;
   const savedProduct = await productModel.create(product);
 
@@ -20,10 +24,10 @@ exports.createProduct = async (req, res, next) => {
     success: true,
     savedProduct,
   });
-};
+});
 
 // Update product -- Admin
-exports.updateProduct = async (req, res, next) => {
+exports.updateProduct = catchAsyncError(async (req, res, next) => {
   let product = await productModel.findById(req.params.id);
 
   if (!product) {
@@ -40,10 +44,10 @@ exports.updateProduct = async (req, res, next) => {
     success: true,
     message: "product updated successfully",
   });
-};
+});
 
 // Get product details
-exports.getProductDetails = async (req, res, next) => {
+exports.getProductDetails = catchAsyncError(async (req, res, next) => {
   const product = await productModel.findById(req.params.id);
   if (!product) {
     return next(new ErrorHandler("Product not found", 400));
@@ -53,7 +57,7 @@ exports.getProductDetails = async (req, res, next) => {
     success: true,
     product,
   });
-};
+});
 
 // Delete product -- Admin
 exports.deleteProduct = catchAsyncError(async (req, res, next) => {
