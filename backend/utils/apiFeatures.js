@@ -5,7 +5,8 @@ class ApiFeatures {
   }
 
   search() {
-    const keyword = this.queryStr.keyword
+    // making a keyword to put into the query
+    const keyword = this.queryStr.keyword // extracting a keyword and if there is a keyword then it will be true
       ? {
           name: {
             $regex: this.queryStr.keyword,
@@ -30,6 +31,18 @@ class ApiFeatures {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`); // this will replace gt gte lt lte with $gt $gte $lt $lte
 
     this.query = this.query.find(JSON.parse(queryStr));
+    return this;
+  }
+
+  pagination(resultPerPage) {
+    // extracting page value from query string, by_default = 1
+    let currentPage = Number(this.queryStr.page) || 1;
+
+    // calculating to skip products on a page
+    const skip = resultPerPage * (currentPage - 1);
+
+    // query mongodb product model according to our limit i.e: products on a single page and skip i.e: products to be skipped ona single page
+    this.query = this.query.limit(resultPerPage).skip(skip);
     return this;
   }
 }

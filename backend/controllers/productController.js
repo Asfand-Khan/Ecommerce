@@ -5,9 +5,12 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Get all products
 exports.getAllProducts = catchAsyncError(async (req, res, next) => {
+  // for pagination, result per page
+  const resultPerPage = 5;
   const apiFeatures = new ApiFeatures(productModel.find(), req.query)
     .search()
-    .filter();
+    .filter()
+    .pagination(resultPerPage);
   const products = await apiFeatures.query;
 
   res.status(200).json({
