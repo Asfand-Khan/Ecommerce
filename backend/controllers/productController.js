@@ -5,8 +5,9 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Get all products
 exports.getAllProducts = catchAsyncError(async (req, res, next) => {
-  const queryStr = Object.keys(req.query).length === 0 ? null : req.query;
-  const apiFeatures = new ApiFeatures(productModel.find(), queryStr).search();
+  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+    .search()
+    .filter();
   const products = await apiFeatures.query;
 
   res.status(200).json({
