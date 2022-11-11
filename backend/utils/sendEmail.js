@@ -6,13 +6,13 @@ exports.sendEmail = async ({ email, subject, message }) => {
     port: 465,
     service: "gmail",
     auth: {
-      email: "khanasfand174@gmail.com",
-      pass: "7s3p4x4c1y1j8w2tjnoykrpi",
+      email: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: "khanasfand174@gmail.com",
+    from: process.env.SMTP_EMAIL,
     to: email,
     subject,
     html: message,
