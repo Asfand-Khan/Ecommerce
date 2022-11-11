@@ -9,8 +9,13 @@ module.exports = (err, req, res, next) => {
     err = new ErrorHandler(message, 400);
   }
 
+  if (err.code === "E11000") {
+    const message = `duplicate ${Object.keys(err.keyValue)} entered`;
+    err = new ErrorHandler(message, 400);
+  }
+
   res.status(err.statusCode).json({
     success: false,
-    error: err.message,
+    message: err.message,
   });
 };
