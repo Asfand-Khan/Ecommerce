@@ -124,3 +124,50 @@ exports.createProductReveiws = catchAsyncError(async (req, res, next) => {
     message: "Review added succesfully",
   });
 });
+
+// Get all reveiws
+exports.getProductReviews = catchAsyncError(async (req, res, next) => {
+  const productId = req.query.productId;
+  const product = await productModel.findById(productId);
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    reviews: product.reviews,
+  });
+});
+
+exports.deleteProductReview = catchAsyncError(async (req, res, next) => {
+  const { productId, reviewId } = req.query;
+
+  const product = await productModel.findById(productId);
+
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
+  }
+
+  const reveiws = product.reviews.filter(
+    (rev) => rev._id.toString() !== reviewId.toString()
+  );
+
+  let average = 0;
+  reveiws.forEach((rev) => {
+    average = average + rev.rating;
+  });
+
+  const ratings = average / reveiws.length || 0;
+
+  const numOfReviews = reveiws.length;
+
+  await productModel.findByIdAndUpdate(
+    productId,
+    { ratings, numOfReviews, reviews: reveiws },
+    { new: true, runValidators: true, useFindAndModify: false }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Review has been deleted",
+  });
+});
