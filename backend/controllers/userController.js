@@ -169,7 +169,7 @@ exports.updateMyProfile = catchAsyncError(async (req, res, next) => {
   const user = await userModel.findByIdAndUpdate(req.user.id, newData, {
     new: true,
     runValidators: true,
-    userFindAndModify: false,
+    useFindAndModify: false,
   });
 
   res.status(200).json({
@@ -194,7 +194,7 @@ exports.getUserDetail = catchAsyncError(async (req, res, next) => {
 
   if (!user) {
     return next(
-      new ErrorHandler("User does not exist with ID: " + req.params.id)
+      new ErrorHandler("User does not exist with ID: " + req.params.id, 400)
     );
   }
 
